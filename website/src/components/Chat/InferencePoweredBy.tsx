@@ -1,30 +1,29 @@
-import { Grid, Heading } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
+import { useTranslation } from "next-i18next";
+import { Fragment } from "react";
 import { TeamMember } from "src/components/TeamMember";
 
 import data from "../../data/team.json";
 
-const SponsorGroup = ({ heading, members }) => {
-  const { people } = data;
-  return (
-    <>
-      <Heading size="sm" mt={3} mb={1}>
-        {heading}
-      </Heading>
-      <Grid gap="6" gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))">
-        {members.map((id) => {
-          const info = people[id] ?? {};
-          return <TeamMember {...info} key={id} />;
-        })}
-      </Grid>
-    </>
-  );
+const sponsors = ["hf", "stability", "redmond", "wandb"] as const;
+
+const rootProps = {
+  bg: "transparent",
+  borderRadius: 0,
 };
 
 export const InferencePoweredBy = () => {
+  const { t } = useTranslation("chat");
   return (
-    <>
-      <SponsorGroup heading="Inference powered by" members={["hf", "stability"]} />
-      <SponsorGroup heading="Model training supported by" members={["redmond", "wandb"]} />
-    </>
+    <Flex direction="column" justifyContent="center" borderTopWidth="1px" p="2">
+      <Flex justifyContent="center" pb="2" fontSize="sm" color="gray.500">
+        {t("sponsored_by")}
+      </Flex>
+      {sponsors.map((id) => (
+        <Fragment key={id}>
+          <TeamMember {...data.people[id]} rootProps={rootProps}></TeamMember>
+        </Fragment>
+      ))}
+    </Flex>
   );
 };

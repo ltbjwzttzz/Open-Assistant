@@ -1,51 +1,48 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
-import { getToken } from "next-auth/jwt";
+import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import React from "react";
 import { ChatListBase } from "src/components/Chat/ChatListBase";
-import { getDashboardLayout } from "src/components/Layout";
-import { isChatEnable } from "src/lib/isChatEnable";
-import { createInferenceClient } from "src/lib/oasst_inference_client";
-import { GetChatsResponse } from "src/types/Chat";
+import { DashboardLayout } from "src/components/Layout";
+export { getStaticProps } from "src/lib/defaultServerSideProps";
+import { useBrowserConfig } from "src/hooks/env/BrowserEnv";
 
-type ChatListProps = {
-  chatResponse: GetChatsResponse;
-};
+const ChatList = () => {
+  const { t } = useTranslation();
+  const { BYE } = useBrowserConfig();
+  const router = useRouter();
 
-const ChatList = ({ chatResponse }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { t } = useTranslation(["chat"]);
+  React.useEffect(() => {
+    if (BYE) {
+      router.push("/bye");
+    }
+  }, [router, BYE]);
 
   return (
     <>
       <Head>
         <title>{t("chat")}</title>
       </Head>
-      <ChatListBase chats={chatResponse} isSideBar={false} className="max-w-5xl mx-auto" />
+      <ChatListBase
+        // TODO: enable this after visually differentiating hidden from visible chats & allowing 'unhide'
+        allowViews={process.env.NODE_ENV === "development"}
+        className="max-w-5xl mx-auto"
+        pt="4"
+        px="4"
+        borderRadius="xl"
+        _light={{
+          bg: "white",
+        }}
+        _dark={{
+          bg: "gray.700",
+        }}
+        shadow="md"
+        noScrollbar
+      />
     </>
   );
 };
 
-ChatList.getLayout = getDashboardLayout;
-
-export const getServerSideProps: GetServerSideProps<ChatListProps> = async ({ locale = "en", req }) => {
-  if (!isChatEnable()) {
-    return {
-      notFound: true,
-    };
-  }
-
-  const token = await getToken({ req });
-  const client = createInferenceClient(token!);
-  const chats = await client.get_my_chats();
-
-  return {
-    props: {
-      chatResponse: chats,
-      ...(await serverSideTranslations(locale)),
-    },
-  };
-};
+ChatList.getLayout = DashboardLayout;
 
 export default ChatList;

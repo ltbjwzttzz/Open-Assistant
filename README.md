@@ -3,6 +3,10 @@
   <img width="auto" height="50px" src="https://github.com/LAION-AI/Open-Assistant/blob/main/assets/logo_crop.png"/>
 </h1>
 
+<blockquote>
+<p>:memo: <strong>NOTE</strong>: OpenAssistant is completed, and the project is now finished. Thank you to everyone who contributed! Check out our <a href="https://projects.laion.ai/Open-Assistant/blog/2023/10/25/open-assistant-is-completed">blog post</a> for more information. The final published oasst2 dataset can be found on HuggingFace at <a href="https://huggingface.co/datasets/OpenAssistant/oasst2">OpenAssistant/oasst2</a></p>
+</blockquote>
+
 <div align="center">
 
 <a href="https://github.com/LAION-AI/Open-Assistant/stargazers">![GitHub Repo stars](https://img.shields.io/github/stars/LAION-AI/Open-Assistant?style=social)</a>
@@ -16,6 +20,7 @@
 <a href="https://github.com/LAION-AI/Open-Assistant/actions/workflows/production-deploy.yaml">![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/LAION-AI/Open-Assistant/production-deploy.yaml?label=deploy-production)</a>
 <a href="https://github.com/LAION-AI/Open-Assistant/actions/workflows/release.yaml">![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/LAION-AI/Open-Assistant/release.yaml?label=deploy-release)</a>
 <a href="https://github.com/LAION-AI/Open-Assistant/releases">![GitHub release (latest by date)](https://img.shields.io/github/v/release/LAION-AI/Open-Assistant)</a>
+<a href="https://github-com.translate.goog/LAION-AI/Open-Assistant/blob/main/README.md?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp">![Translate](https://img.shields.io/badge/Translate-blue)</a>
 
 </div>
 
@@ -82,6 +87,9 @@ if you have problems):
 ```sh
 docker compose --profile ci up --build --attach-dependencies
 ```
+
+> **Note:** when running on MacOS with an M1 chip you have to use:
+> `DB_PLATFORM=linux/x86_64 docker compose ...`
 
 Then, navigate to `http://localhost:3000` (It may take some time to boot up) and
 interact with the website.

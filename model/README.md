@@ -1,8 +1,10 @@
+<a href="https://github-com.translate.goog/LAION-AI/Open-Assistant/blob/main/model/README.md?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp">![Translate](https://img.shields.io/badge/Translate-blue)</a>
+
 ## Reproduction directions
 
 Here are some minimal commands to tun to whole pipeline on the collected data.
 
-**make sure python >= 3.10, othersie, you would meet the
+**make sure python >= 3.10, otherwise, you would meet the
 [[issue]](https://github.com/tiangolo/typer/issues/371#issuecomment-1288987924)**
 
 1. First create the data path location.
@@ -14,15 +16,49 @@ export DATA_PATH=$PWD/.cache
 export MODEL_PATH=$PWD/.saved_models
 ```
 
-2. Then download the OA data.
+2. Then download the OA message tree JSONL file or declare the HuggingFace
+   dataset to use.
+
+Create a new or modify an existing configuration section in the `config.yaml`
+(SFT), `config_rm.yaml` (RM) or `config_rl.yaml` (RL) YAML configuration files
+located in the `model_training/configs/` directory and specify the OA JSONL data
+file or HuggingFace dataset to use.
+
+- To use a local OASST JSONL file (either `.jsonl` or `.jsonl.gz`) specify the
+  file name with the `input_file_path` configuration option. Place the file
+  either in the `cache_dir` (`DATA_PATH`) or specify an absolute path.
 
 ```bash
-cp /path/to/<oa.jsonl> $DATA_PATH
+cp /path/to/<oasst.trees.jsonl> $DATA_PATH
 ```
 
-Change the `<oa.jsonl>` file used in the `model_training/configs/config.yaml`,
-`model_training/configs/config_rl.yaml` and `reward/instructor/rank_datasets.py`
-files.
+Example:
+
+```yaml
+my_data_config:
+  datasets:
+    - oasst_export:
+      input_file_path: oasst_export.trees.jsonl.gz
+```
+
+- To use a HuggingFace dataset specify the dataset name with the
+  `hf_dataset_name` configuration option.
+
+Example:
+
+```yaml
+my_data_config:
+  datasets:
+    - oasst_export:
+      hf_dataset_name: OpenAssistant/oasst1
+```
+
+_Note_: If both `hf_dataset_name` and `input_file_path` are specified
+`input_file_path` will take precedence.
+
+See the
+[OpenAssistant/oasst1](https://huggingface.co/datasets/OpenAssistant/oasst1)
+dataset card on the HuggingFace hub for more information.
 
 - (TODO) add better parsing of the config files that is consistent for sft, rm
   and rl training.
@@ -62,8 +98,8 @@ export SFT_MODEL=$MODEL_PATH/sft_model/$(ls -t $MODEL_PATH/sft_model/ | head -n 
 5. Train the reward model
 
 ```bash
-cd ../reward/instructor
-python trainer.py configs/deberta-v3-base.yml --output_dir $MODEL_PATH/reward_model
+cd model_training
+python trainer_rm.py --configs defaults_rm oasst-rm-1-pythia-1b
 ```
 
 6. Get RM trained model
@@ -81,7 +117,7 @@ export REWARD_MODEL=$MODEL_PATH/reward_model/$(ls -t $MODEL_PATH/reward_model/ |
 7. Train the RL agent
 
 ```bash
-cd ../../model_training
+cd model_training
 python trainer_rl.py --configs defaults_rlhf --cache_dir $DATA_PATH --rank_model $REWARD_MODEL --sft_model $SFT_MODEL --output_dir $MODEL_PATH/rl_model
 ```
 

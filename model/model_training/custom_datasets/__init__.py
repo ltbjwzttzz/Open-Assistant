@@ -5,19 +5,28 @@ from typing import Optional
 
 import numpy as np
 from model_training.custom_datasets.extra_rm_datasets import load_anthropic_rlhf, load_hellaswag, load_shp
-from model_training.custom_datasets.instruction import INSTRUCTION_DATASETS, InstructionDataset
+from model_training.custom_datasets.instruction import (
+    INSTRUCTION_DATASETS,
+    RAG_DATASETS,
+    InstructionDataset,
+    RAGDataset,
+)
 from model_training.custom_datasets.oasst_dataset import load_oasst_export
-from model_training.custom_datasets.prompt_dialogue import Gpt4All, load_oig_file
+from model_training.custom_datasets.pretrain_datasets import FanFics, RedPajama
+from model_training.custom_datasets.prompt_dialogue import DolphinMix, Gpt4All, OrcaChat, load_oig_file
 from model_training.custom_datasets.qa_datasets import (
     SODA,
     AlpacaGpt4,
     DatabricksDolly15k,
+    Dolly15kMultilingual,
+    GPTeacher_Roleplay,
     JokeExplaination,
     QADataset,
     SODADialogue,
     TranslatedQA,
     Vicuna,
     WebGPT,
+    WizardEvolInstructV2,
     load_alpaca_dataset,
 )
 from model_training.custom_datasets.rank_datasets import AugmentedOA
@@ -48,6 +57,7 @@ OTHER = [
 ]
 
 RL_DATASETS = [
+    "oasst_export",
     "webgpt",
     "private_tuning",
     "alpaca",
@@ -107,7 +117,8 @@ def get_one_dataset(
             eval = SummarizationDataset(dataset_name, data_path, "validation")
             train = dataset
     elif dataset_name in INSTRUCTION_DATASETS:
-        dataset = InstructionDataset(dataset_name, data_path, "train")
+        dataset_args = INSTRUCTION_DATASETS[dataset_name]
+        dataset = InstructionDataset(name=dataset_name, cache_dir=data_path, split="train", **(dataset_args | kwargs))
     elif "ted_trans" in dataset_name:
         language_pair = dataset_name.split("_")[-1]
         dataset = TEDTalk(pair=language_pair, split="train")
@@ -124,11 +135,9 @@ def get_one_dataset(
     elif dataset_name == "gpt4all":
         dataset = Gpt4All(mode=mode, cache_dir=data_path)
     elif dataset_name == "prosocial_dialogue":
-        train = ProsocialDialogue(cache_dir=data_path, split="train")
-        eval = ProsocialDialogue(cache_dir=data_path, split="validation")
+        dataset = ProsocialDialogue(cache_dir=data_path, split="train")
     elif dataset_name == "explain_prosocial":
-        train = ProsocialDialogueExplaination(cache_dir=data_path, split="train")
-        eval = ProsocialDialogueExplaination(cache_dir=data_path, split="validation")
+        dataset = ProsocialDialogueExplaination(cache_dir=data_path, split="train")
     elif dataset_name == "soda":
         dataset = SODA(data_path, **kwargs)
     elif dataset_name == "soda_dialogue":
@@ -140,6 +149,8 @@ def get_one_dataset(
         dataset = TranslatedQA(data_path)
     elif dataset_name == "vicuna":
         dataset = Vicuna(cache_dir=data_path, **kwargs)
+    elif dataset_name == "wizard_evol_instruct_v2":
+        dataset = WizardEvolInstructV2(cache_dir=data_path, **kwargs)
     elif dataset_name == "oasst_export":
         train, eval = load_oasst_export(data_path=data_path, val_split=val_split, mode=mode, **kwargs)
     elif dataset_name == "hf_summary":
@@ -162,9 +173,23 @@ def get_one_dataset(
     elif dataset_name == "hellaswag":
         train, eval = load_hellaswag()
     elif dataset_name == "dolly15k":
-        dataset = DatabricksDolly15k(cache_dir=data_path)
+        dataset = DatabricksDolly15k(cache_dir=data_path, mode=mode, **kwargs)
+    elif dataset_name == "dolly15k_multilingual":
+        dataset = Dolly15kMultilingual(cache_dir=data_path, mode=mode, **kwargs)
     elif dataset_name == "alpaca_gpt4":
-        dataset = AlpacaGpt4(cache_dir=data_path, **kwargs)
+        dataset = AlpacaGpt4(cache_dir=data_path, mode=mode, **kwargs)
+    elif dataset_name == "red_pajama":
+        dataset = RedPajama(cache_dir=data_path, mode=mode, **kwargs)
+    elif dataset_name == "fanfics":
+        dataset = FanFics(cache_dir=data_path, mode=mode, **kwargs)
+    elif dataset_name == "gpteacher_roleplay":
+        dataset = GPTeacher_Roleplay(cache_dir=data_path, mode=mode, **kwargs)
+    elif dataset_name == "orca-chat":
+        dataset = OrcaChat(cache_dir=data_path, **kwargs)
+    elif dataset_name == "dolphin-mix":
+        dataset = DolphinMix(cache_dir=data_path, **kwargs)
+    elif dataset_name in RAG_DATASETS.keys():
+        dataset = RAGDataset(dataset_name, cache_dir=data_path, **kwargs)
     else:
         raise ValueError(f"Unknown dataset {dataset_name}")
 
@@ -173,7 +198,7 @@ def get_one_dataset(
         train, eval = train_val_dataset(dataset, val_split=val_split)
 
     if eval and max_val_set and len(eval) > max_val_set:
-        subset_indices = np.random.choice(len(eval), max_val_set)
+        subset_indices = np.random.choice(len(eval), size=max_val_set, replace=False)
         eval = Subset(eval, subset_indices)
 
     return train, eval

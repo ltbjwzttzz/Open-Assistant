@@ -1,3 +1,5 @@
+<a href="https://github-com.translate.goog/LAION-AI/Open-Assistant/blob/main/CONTRIBUTING.md?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp">![Translate](https://img.shields.io/badge/Translate-blue)</a>
+
 # I’m in! Now what?
 
 [Join the OpenAssistant Contributors Discord Server!](https://ykilcher.com/open-assistant-discord),
@@ -141,3 +143,11 @@ automatically deploy the built release to the dev machine.
 
 See
 [here](https://github.com/LAION-AI/Open-Assistant/blob/main/data/datasets/README.md)
+
+## Translations
+
+[![translation badge](https://inlang.com/badge?url=github.com/LAION-AI/Open-Assistant)](https://inlang.com/editor/github.com/LAION-AI/Open-Assistant?ref=badge)
+
+To add translations, you can manually edit the JSON translation files in
+`website/public/locales`, use the [inlang](https://inlang.com/) online editor,
+or run `npm run inlang:lint` inside `website` to find missing translations.

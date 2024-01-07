@@ -34,12 +34,13 @@ def main():
         tokenizer = None
     else:
         tokenizer: transformers.PreTrainedTokenizer = transformers.AutoTokenizer.from_pretrained(model_config.model_id)
-        logger.warning(f"Tokenizer {tokenizer.name_or_path} vocab size: {tokenizer.vocab_size}")
+        logger.warning(f"Tokenizer {tokenizer.name_or_path} vocab size: {len(tokenizer)}")
 
     inference_http = utils.HttpClient(
         base_url=settings.inference_server_url,
         basic_auth_username=settings.basic_auth_username,
         basic_auth_password=settings.basic_auth_password,
+        bearer_token=settings.bearer_token,
     )
 
     while True:

@@ -1,7 +1,7 @@
 Dataset Description This dataset contains around 14,000 poems from the
-PoetryFoundation.org site. They are converted to question:response pairs,
-usingthe tags as topics. 5% of the dataset is titling requests -- the user
-provides apoem and asks the assistant to title it.
+PoetryFoundation.org site. They are converted to question:response pairs, using
+the tags as topics. 5% of the dataset is titling requests -- the user provides a
+poem and asks the assistant to title it.
 
 It can be found here, on my HuggingFace -
 https://huggingface.co/datasets/checkai/instruction-poems
@@ -12,7 +12,7 @@ Dataset Structure This dataset follows the OA format, which is:
 
 INSTRUCTION (string): The user asks for a poem (from a variety of premade
 prompts) with topics (tags). If the given poem has no tags, the user asks for a
-poem on it's own.
+poem on its own.
 
 RESPONSE (string): The assistant replies with the poem and title (from a variety
 of premade prompts).

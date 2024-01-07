@@ -72,15 +72,15 @@ export function UserMenu() {
     <Menu>
       <MenuButton border="solid" borderRadius="full" borderWidth="thin" borderColor={borderColor}>
         <Box display="flex" alignItems="center" gap="3" p="1">
-          <Avatar size="sm" src={session.user.image!} />
-          <Text data-cy="username" className="hidden lg:flex ltr:pr-2 rtl:pl-2">
+          <Avatar size="sm" src={session.user.image} />
+          <Text data-cy="username" className="hidden lg:flex ltr:pr-2 rtl:pl-2" style={{ overflow: "hidden" }}>
             {session.user.name || "New User"}
           </Text>
         </Box>
       </MenuButton>
       <MenuList p="2" borderRadius="xl" shadow="none">
         <Box display="flex" flexDirection="column" alignItems="center" borderRadius="md" p="1" gap="2">
-          <Text>
+          <Text style={{ overflow: "hidden" }}>
             {session.user.name}
             {isAdminOrMod ? (
               <Badge size="xs" ml="2" fontSize="xs" textTransform="capitalize">
